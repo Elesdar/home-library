@@ -1,0 +1,44 @@
+services:
+#  mysql:
+#    image: mysql:8.0
+#    command: --default-authentication-plugin=mysql_native_password
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - mysql_database:/var/lib/mysql
+#    environment:
+#      MYSQL_ROOT_PASSWORD: secret
+#      MYSQL_USER: msqluser
+#      MYSQL_PASSWORD: msqlpass
+  postgres:
+    image: postgres:17.4
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRESQL_DATABASE: db
+      POSTGRESQL_USERNAME: user
+      POSTGRESQL_PASSWORD: password
+
+  php:
+    build:
+      context: ./php
+    volumes:
+      - ./my-app/:/var/www/my-app
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./my-app/:/var/www/my-app
+      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/logs:/var/log/nginx/
+    depends_on:
+      - php
+#      - mysql
+      - postgres
+volumes:
+#  mysql_database:
+  pgdata:
